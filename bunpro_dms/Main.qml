@@ -38,6 +38,7 @@ PluginComponent {
 
             if (shouldReload && (newKey !== "")) {
                 root.bunpro.apiKey = newKey;
+                root.bunpro.dangerouslyAuthenticateUsingApiKey = newDangerousLoad;
                 console.info("bunpro setting changed; refreshing forecast");
                 root.bunpro.refreshForecast();
             }
