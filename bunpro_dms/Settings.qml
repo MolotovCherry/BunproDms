@@ -16,7 +16,7 @@ PluginSettings {
     ToggleSetting {
         settingKey: "dangerouslyAuthenticateUsingApiKey"
         label: "Use App API Key"
-        description: "Use Bunpro 3rd party app API key instead of ephemeral website api key. [WARN: Key lives forever and should manually be rotated if leaked!]"
+        description: "Use Bunpro 3rd party app API key instead of short lived website api key. [WARN: Key lives forever and should manually be rotated if leaked!]"
         defaultValue: true
     }
 }
