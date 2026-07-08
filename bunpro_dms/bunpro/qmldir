@@ -1,0 +1,5 @@
+module bunpro
+optional plugin bunpro
+classname bunpro_plugin
+typeinfo plugin.qmltypes
+prefer :/qt/qml/bunpro/

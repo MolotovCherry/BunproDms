@@ -1,0 +1,20 @@
+{
+  "lsp": {
+    "rust-analyzer": {
+      "initialization_options": {
+        "check": {
+          "command": "clippy",
+        },
+      },
+    },
+    "qmljs": {
+      "binary": {
+        "arguments": ["-E"],
+        "env": {
+          "QMLLS_NO_CMAKE_CALLS": "true",
+          "QML_IMPORT_PATH": "/usr/bin:/usr/lib/qt6/qml:/home/cherry/.config/quickshell:/home/cherry/Projects/dms-bunpro-stats",
+        },
+      },
+    },
+  },
+}

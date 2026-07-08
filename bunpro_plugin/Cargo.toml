@@ -1,0 +1,22 @@
+[package]
+name = "bunpro"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+link_qt_object_files = [ "cxx-qt-build/link_qt_object_files" ]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+bunpro_client = { path = "../bunpro_client" }
+cxx = "1.0.194"
+cxx-qt = "0.9.1"
+cxx-qt-lib = { version = "0.9.1", features = ["qt_full"] }
+jiff = "0.2.31"
+tokio = "1.52.3"
+tokio-util = "0.7.18"
+
+[build-dependencies]
+cxx-qt-build = "0.9.1"

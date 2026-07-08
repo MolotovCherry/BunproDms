@@ -1,0 +1,10 @@
+[package]
+name = "bunpro_client"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+bunpro_api = { path = "../bunpro_api" }
+jiff = "0.2.31"
+snafu = "0.9.1"
+tokio = { version = "1.52.3", features = ["rt", "rt-multi-thread", "macros", "full"] }

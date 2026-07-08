@@ -1,0 +1,8 @@
+[workspace]
+resolver = "3"
+members = ["bunpro_api", "bunpro_client", "bunpro_plugin"]
+
+[profile.release]
+lto = true
+debug = false
+strip = true

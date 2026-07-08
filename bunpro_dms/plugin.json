@@ -1,0 +1,12 @@
+{
+  "id": "bunpro",
+  "name": "Bunpro",
+  "description": "Show bunpro stats",
+  "version": "1.0.0",
+  "author": "Cherry",
+  "icon": "language_japanese_kana",
+  "type": "widget",
+  "component": "./Main.qml",
+  "settings": "./Settings.qml",
+  "permissions": ["settings_read", "settings_write"]
+}
