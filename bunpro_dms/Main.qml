@@ -18,6 +18,7 @@ PluginComponent {
     property Bunpro bunpro: Bunpro {
         apiKey: pluginData?.apiKey || ""
         dangerouslyAuthenticateUsingApiKey: pluginData?.dangerouslyAuthenticateUsingApiKey !== undefined ? pluginData.dangerouslyAuthenticateUsingApiKey : true
+        updateInterval: pluginData?.updateInterval !== undefined ? pluginData.updateInterval : 15
 
         onError: error => ToastService.showError("Bunpro Error", error)
     }
