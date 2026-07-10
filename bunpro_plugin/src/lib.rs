@@ -253,16 +253,6 @@ impl qobject::Bunpro {
 
         self.runtime.spawn(async move {
             loop {
-                let res = qthread.queue(|this| {
-                    this.current_changed();
-                });
-
-                if let Err(e) = res {
-                    q_warning!("QThread failed: {e:?}");
-                    q_warning!("Spawn Hourly Update Timer has unexpectedly exited!");
-                    break;
-                }
-
                 let now = Zoned::now();
                 let next_hour = now
                     .with()
@@ -278,6 +268,14 @@ impl qobject::Bunpro {
                 let left = now.duration_until(&next_hour).as_secs() + 1;
 
                 time::sleep(Duration::from_secs(left as _)).await;
+
+                let res = qthread.queue(|this| {
+                    this.current_changed();
+                });
+
+                if res.is_err() {
+                    break;
+                }
             }
         });
     }
@@ -317,9 +315,7 @@ impl qobject::Bunpro {
                     this.refresh_forecast();
                 });
 
-                if let Err(e) = res {
-                    q_warning!("QThread failed: {e:?}");
-                    q_warning!("Spawn Forecast Update Timer has unexpectedly exited!");
+                if res.is_err() {
                     break;
                 }
             }

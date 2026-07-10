@@ -1,0 +1,3 @@
+module Services
+
+singleton BunproService 1.0 BunproService.qml

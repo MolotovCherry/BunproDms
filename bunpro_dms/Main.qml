@@ -8,40 +8,36 @@ import qs.Widgets
 import qs.Modules.Plugins
 import qs.Services
 
-import "./bunpro"
+import "./Services"
 
 PluginComponent {
     id: root
 
     layerNamespacePlugin: "bunpro"
 
-    property Bunpro bunpro: Bunpro {
-        apiKey: pluginData?.apiKey || ""
-        dangerouslyAuthenticateUsingApiKey: pluginData?.dangerouslyAuthenticateUsingApiKey !== undefined ? pluginData.dangerouslyAuthenticateUsingApiKey : true
-        updateInterval: pluginData?.updateInterval !== undefined ? pluginData.updateInterval : 15
-
-        onError: error => ToastService.showError("Bunpro Error", error)
-    }
-
     Connections {
         target: root.pluginService
+
         function onPluginDataChanged(changedId) {
             if (changedId !== root.layerNamespacePlugin) {
                 return;
             }
 
-            const oldKey = root.bunpro.apiKey;
+            const oldKey = BunproService.apiKey;
             const newKey = root.pluginService.loadPluginData(root.layerNamespacePlugin, "apiKey", "");
-            const oldDangerousLoad = root.bunpro.dangerouslyAuthenticateUsingApiKey;
+            const oldDangerousLoad = BunproService.dangerouslyAuthenticateUsingApiKey;
             const newDangerousLoad = root.pluginService.loadPluginData(root.layerNamespacePlugin, "dangerouslyAuthenticateUsingApiKey", true);
             // settings changed, so we should try to reload data
             const shouldReload = (oldKey != newKey) || (oldDangerousLoad !== newDangerousLoad);
 
-            if (shouldReload && (newKey !== "")) {
-                root.bunpro.apiKey = newKey;
-                root.bunpro.dangerouslyAuthenticateUsingApiKey = newDangerousLoad;
-                console.info("bunpro setting changed; refreshing forecast");
-                root.bunpro.refreshForecast();
+            const updateInterval = root.pluginService.loadPluginData(root.layerNamespacePlugin, "updateInterval", 15);
+
+            BunproService.apiKey = newKey;
+            BunproService.dangerouslyAuthenticateUsingApiKey = newDangerousLoad;
+            BunproService.updateInterval = updateInterval;
+
+            if (shouldReload) {
+                BunproService.refreshForecast();
             }
         }
 
@@ -50,19 +46,16 @@ PluginComponent {
                 return;
             }
 
-            if (root.bunpro.apiKey !== "") {
-                console.info("bunpro settings loaded; refreshing forecast");
-                root.bunpro.refreshForecast();
-            }
+            // now set settings and refresh
+            BunproService.apiKey = root.pluginData?.apiKey || "";
+            BunproService.dangerouslyAuthenticateUsingApiKey = root.pluginData?.dangerouslyAuthenticateUsingApiKey ?? true;
+            BunproService.updateInterval = root.pluginData?.updateInterval ?? 15;
+
+            BunproService.refreshForecast();
         }
     }
 
-    pillRightClickAction: (x, y, width, section, screen) => {
-        if (root.bunpro.apiKey !== "") {
-            console.info("bunpro right clicked; refreshing forecast");
-            root.bunpro.refreshForecast();
-        }
-    }
+    pillRightClickAction: (x, y, width, section, screen) => BunproService.refreshForecast()
 
     horizontalBarPill: Component {
         Row {
@@ -89,7 +82,7 @@ PluginComponent {
                         id: grammarLabel
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text: root.bunpro.current.grammar.total
+                        text: BunproService.current.grammar.total
                         font.pixelSize: Theme.fontSizeSmall
                     }
                 }
@@ -116,7 +109,7 @@ PluginComponent {
                         id: vocabLabel
                         anchors.verticalCenter: parent.verticalCenter
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text: root.bunpro.current.vocab.total
+                        text: BunproService.current.vocab.total
                         font.pixelSize: Theme.fontSizeSmall
                     }
                 }

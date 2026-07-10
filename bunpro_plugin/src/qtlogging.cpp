@@ -19,7 +19,7 @@ namespace rust {
         {
         qt_message_output(
             type,
-            QMessageLogContext(fileName, lineNumber, nullptr, "EcchanClient"),
+            QMessageLogContext(fileName, lineNumber, nullptr, "Bunpro"),
             message);
         }
 
