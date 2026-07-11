@@ -1,6 +1,10 @@
 use std::collections::BTreeMap;
 
-use jiff::{Timestamp, civil::Date, tz::TimeZone};
+use jiff::{
+    Timestamp,
+    civil::{Date, DateTime},
+    tz::TimeZone,
+};
 use serde::{Deserialize, Deserializer, Serialize};
 
 pub type CardCount = u32;
@@ -48,7 +52,19 @@ where
     use std::sync::LazyLock;
     static CURRENT_TZ: LazyLock<TimeZone> = LazyLock::new(TimeZone::system);
 
-    let ts = Timestamp::deserialize(de)?.to_zoned(CURRENT_TZ.clone());
+    let s = <&str as Deserialize>::deserialize(de)?;
 
-    Ok(ts)
+    let naive_dt: DateTime = s
+        .trim_end_matches('Z')
+        .parse()
+        .map_err(serde::de::Error::custom)?;
+
+    let now = jiff::Zoned::new(Timestamp::now(), TimeZone::UTC)
+        .with()
+        .time(naive_dt.time())
+        .build()
+        .map_err(serde::de::Error::custom)?
+        .with_time_zone(CURRENT_TZ.clone());
+
+    Ok(now)
 }
