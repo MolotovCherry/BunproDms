@@ -15,7 +15,7 @@ use crate::objects::{Forecast, ForecastEntry, ForecastObject};
 
 #[derive(Debug, Snafu)]
 pub enum BunproClientError {
-    #[snafu(display("{source:?}"))]
+    #[snafu(display("{source}"))]
     RequestError { source: RequestError },
 }
 
@@ -79,7 +79,7 @@ impl BunproClient {
 
 #[derive(Debug, Snafu)]
 pub enum BunproClientBuilderError {
-    #[snafu(display("{source:?}"))]
+    #[snafu(display("{source}"))]
     Reqwest { source: reqwest::Error },
     #[snafu(display("Api token is required"))]
     MissingApiToken,

@@ -1,3 +1,6 @@
+use std::fmt::{self, Display};
+
+use log::{error, trace};
 use reqwest::{IntoUrl, StatusCode};
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -16,9 +19,21 @@ pub(crate) enum RequestMethod {
     Delete,
 }
 
+impl Display for RequestMethod {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            RequestMethod::Get => write!(f, "GET"),
+            RequestMethod::Patch => write!(f, "PATCH"),
+            RequestMethod::Post => write!(f, "POST"),
+            RequestMethod::Put => write!(f, "PUT"),
+            RequestMethod::Delete => write!(f, "DELETE"),
+        }
+    }
+}
+
 #[derive(Snafu, Debug)]
 pub enum RequestError {
-    #[snafu(display("Error occurred during request: {source:?}"))]
+    #[snafu(display("Error occurred during request: {source}"))]
     ReqwestError { source: reqwest::Error },
     #[snafu(display("Invalid token (Expired access tokens, Invalid access tokens, etc.)"))]
     Unauthorized { codes: Option<Vec<String>> },
@@ -28,7 +43,7 @@ pub enum RequestError {
     Forbidden { codes: Option<Vec<String>> },
     #[snafu(display("Not found"))]
     NotFound,
-    #[snafu(display("[{code:?}]: {codes:?}"))]
+    #[snafu(display("[{code}]: {codes:?}"))]
     StatusCode {
         code: StatusCode,
         codes: Option<Vec<String>>,
@@ -130,6 +145,8 @@ impl<'a> ApiRequest<'a> {
             use_settings_token,
         );
 
+        trace!("{method} {url}");
+
         let mut request = match method {
             RequestMethod::Get => self.client.http.get(url),
             RequestMethod::Delete => self.client.http.delete(url),
@@ -150,6 +167,7 @@ impl<'a> ApiRequest<'a> {
 
         if status.is_client_error() {
             let text = response.text().await.unwrap_or_default();
+
             let codes = serde_json::from_str::<ApiError>(&text)
                 .map(|e| e.errors.into_iter().map(|i| i.code).collect())
                 .ok();
@@ -162,11 +180,24 @@ impl<'a> ApiRequest<'a> {
                 code => RequestError::StatusCode { code, codes },
             };
 
+            error!(status:%, body:% = text, error:% = err; "api response body");
+
             return Err(err);
         }
 
         let text = response.text().await.context(ReqwestSnafu)?;
-        let data = serde_json::from_str(&text).context(ParseSnafu)?;
+
+        let data = match serde_json::from_str(&text).context(ParseSnafu) {
+            Ok(s) => {
+                trace!(body:% = text; "api response body");
+                s
+            }
+
+            Err(e) => {
+                error!(body:% = text, error:% = e; "api response body");
+                return Err(e);
+            }
+        };
 
         Ok(data)
     }

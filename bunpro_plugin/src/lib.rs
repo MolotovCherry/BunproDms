@@ -1,9 +1,11 @@
+mod log;
 mod panic;
 mod qtlogging;
 mod setup;
 
 use std::{pin::Pin, sync::Arc, time::Duration};
 
+use ::log::{trace, warn};
 use bunpro_client::{
     BunproClient,
     bunpro_api::config::Token,
@@ -137,13 +139,13 @@ impl qobject::Bunpro {
             {
                 let mut client = client.lock().await;
                 if let Err(e) = client.refresh_forecast().await {
-                    q_warning!("Api request failed: {e:?}");
+                    warn!("Api request failed: {e}");
 
                     let res = qthread.queue(move |this| {
-                        this.error(format!("Api request failed: {e:?}").into());
+                        this.error(format!("Api request failed: {e}").into());
                     });
                     if let Err(e) = res {
-                        q_warning!("QThread failed: {e:?}");
+                        warn!("QThread failed: {e}");
                     }
 
                     return;
@@ -160,7 +162,7 @@ impl qobject::Bunpro {
             });
 
             if let Err(e) = res {
-                q_warning!("QThread failed: {e:?}");
+                warn!("QThread failed: {e}");
             }
         });
     }
@@ -265,7 +267,11 @@ impl qobject::Bunpro {
                     .unwrap()
                     + 1.hour();
 
+                trace!("spawn_current_update: next hour at {next_hour:?}");
+
                 let left = now.duration_until(&next_hour).as_secs() + 1;
+
+                trace!("spawn_current_update: sleeping for {left}secs");
 
                 time::sleep(Duration::from_secs(left as _)).await;
 
@@ -304,10 +310,18 @@ impl qobject::Bunpro {
                     .unwrap()
                     + (next as i16).minutes();
 
+                trace!("spawn_forecast_update: next wakeup time is at {next_time:?}");
+
                 let seconds = now.duration_until(&next_time).as_secs() + 1;
 
+                trace!("spawn_forecast_update: sleeping for {seconds}secs");
+
                 select! {
-                    _ = cancel_key.cancelled() => break,
+                    _ = cancel_key.cancelled() => {
+                        trace!("spawn_forecast_update: cancelled");
+                        break
+                    },
+
                     _ = time::sleep(Duration::from_secs(seconds as _)) => ()
                 }
 
@@ -316,6 +330,7 @@ impl qobject::Bunpro {
                 });
 
                 if res.is_err() {
+                    trace!("spawn_forecast_update: qthread error, breaking");
                     break;
                 }
             }
