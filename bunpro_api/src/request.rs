@@ -180,7 +180,7 @@ impl<'a> ApiRequest<'a> {
                 code => RequestError::StatusCode { code, codes },
             };
 
-            error!(status:%, body:% = text, error:% = err; "api response body");
+            error!(status:%, body:% = text, error:% = err; "api error");
 
             return Err(err);
         }
@@ -194,7 +194,7 @@ impl<'a> ApiRequest<'a> {
             }
 
             Err(e) => {
-                error!(body:% = text, error:% = e; "api response body");
+                error!(body:% = text, error:% = e; "failed to parse api reponse");
                 return Err(e);
             }
         };
