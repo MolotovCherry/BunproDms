@@ -39,21 +39,21 @@ impl Log for QtLogger {
 
         _ = write!(
             buf,
-            "[{level}] [{target}",
+            "{level} · {target} ·",
             level = color_level(record.level()),
-            target = record.target()
+            target = record.target().bright_blue()
         );
 
         if let Some(file) = record.file() {
-            _ = write!(buf, " {file}");
+            _ = write!(buf, " {}", file.bright_blue());
+
+            _ = match record.line() {
+                Some(line) => write!(buf, "{}{} ·", ":".bright_blue(), line.bright_blue()),
+                None => write!(buf, " ·"),
+            };
         }
 
-        _ = match record.line() {
-            Some(line) => write!(buf, ":{line}] "),
-            None => write!(buf, "] "),
-        };
-
-        _ = write!(buf, "{msg}", msg = record.args());
+        _ = write!(buf, " {msg}", msg = record.args());
 
         struct KvVisitor<'a> {
             buf: &'a mut String,

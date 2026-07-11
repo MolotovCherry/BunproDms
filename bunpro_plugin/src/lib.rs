@@ -138,7 +138,11 @@ impl qobject::Bunpro {
         self.runtime.spawn(async move {
             {
                 let mut client = client.lock().await;
-                if client.refresh_forecast().await.is_err() {
+                if let Err(e) = client.refresh_forecast().await {
+                    _ = qthread.queue(move |this| {
+                        this.error(format!("Api request failed: {e}").into());
+                    });
+
                     return;
                 }
             }
