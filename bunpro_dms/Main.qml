@@ -59,29 +59,30 @@ PluginComponent {
 
     horizontalBarPill: Component {
         Row {
-            spacing: Theme.spacingXS
+            spacing: Theme.spacingS
 
             Row {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.spacingXS
 
-                DankIcon {
-                    name: "book_2"
-                    size: Theme.iconSizeSmall
-                    color: Theme.surfaceText
+                DankSVGIcon {
                     anchors.verticalCenter: parent.verticalCenter
+                    source: Qt.resolvedUrl("assets/grammar.svg")
+                    size: Theme.iconSizeSmall
+                    colorOverride: Theme.surfaceText
+                    brightnessOverride: 1.0
                 }
 
                 Rectangle {
-                    width: grammarLabel.implicitWidth + Theme.spacingXS
+                    width: grammarLabel.implicitWidth
                     color: "transparent"
                     height: parent.height
                     anchors.verticalCenter: parent.verticalCenter
 
                     StyledText {
                         id: grammarLabel
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.centerIn: parent
+                        anchors.verticalCenterOffset: 1.0
                         text: BunproService.current.grammar.total
                         font.pixelSize: Theme.fontSizeSmall
                     }
@@ -93,22 +94,23 @@ PluginComponent {
                 spacing: Theme.spacingXS
 
                 DankIcon {
+                    anchors.verticalCenter: parent.verticalCenter
+                    anchors.verticalCenterOffset: 0.5
                     name: "language_japanese_kana"
                     size: Theme.iconSize - 4
                     color: Theme.surfaceText
-                    anchors.verticalCenter: parent.verticalCenter
                 }
 
                 Rectangle {
-                    width: vocabLabel.implicitWidth + Theme.spacingXS
+                    width: vocabLabel.implicitWidth
                     color: "transparent"
                     height: parent.height
                     anchors.verticalCenter: parent.verticalCenter
 
                     StyledText {
                         id: vocabLabel
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.centerIn: parent
+                        anchors.verticalCenterOffset: 1.0
                         text: BunproService.current.vocab.total
                         font.pixelSize: Theme.fontSizeSmall
                     }
