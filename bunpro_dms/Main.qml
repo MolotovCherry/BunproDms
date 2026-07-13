@@ -65,12 +65,11 @@ PluginComponent {
                 anchors.verticalCenter: parent.verticalCenter
                 spacing: Theme.spacingXS
 
-                DankSVGIcon {
+                StyledText {
                     anchors.verticalCenter: parent.verticalCenter
-                    source: Qt.resolvedUrl("assets/grammar.svg")
-                    size: Theme.iconSizeSmall
-                    colorOverride: Theme.surfaceText
-                    brightnessOverride: 1.0
+                    text: "文"
+                    font.pixelSize: Theme.fontSizeMedium
+                    font.family: "Open Sans Condensed"
                 }
 
                 Rectangle {
