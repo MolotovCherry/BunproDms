@@ -80,11 +80,21 @@ where
         .parse()
         .map_err(serde::de::Error::custom)?;
 
+    // calculate current hour from utc hour by shifting by our timezone offset
     let new_time = naive_dt.time() + *CURRENT_OFFSET;
 
     let mut current = CURRENT.lock().unwrap();
     if *current == DateTime::ZERO {
-        *current = naive_dt;
+        // DO NOT trust the apis returned date;
+        // rather use our own current system date as the basis so this is portable
+        // this will not depend on the timezone setting on the sites settings
+        // so it always properly in local system time
+        let now = jiff::Zoned::now();
+        *current = naive_dt
+            .with()
+            .date(now.date())
+            .build()
+            .map_err(serde::de::Error::custom)?;
     } else if new_time.hour() == 0 {
         // we overflowed into the next day
         *current += 1.day();
