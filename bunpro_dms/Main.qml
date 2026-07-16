@@ -69,7 +69,7 @@ PluginComponent {
                     anchors.verticalCenter: parent.verticalCenter
                     text: "文"
                     font.pixelSize: Theme.fontSizeMedium
-                    font.family: "Open Sans Condensed"
+                    font.family: "Noto Sans CJK JP Medium"
                 }
 
                 Rectangle {
